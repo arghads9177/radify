@@ -11,27 +11,53 @@
 
 # app/main.py
 from fastapi import FastAPI, Depends, status
+from starlette.middleware.sessions import SessionMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+import os
 from sqlalchemy.orm import Session
 from src.radify_api import models, schemas
 from src.radify_api.database import engine, SessionLocal
-from .auth import signup
+from .auth import signup, signin, google_oauth
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="RADify API")
 
+# Add session middleware with a secret key
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("SECRET_KEY")  # Replace with secure key in production
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[os.getenv("WEB_URL")],  # Angular dev server
+    allow_credentials=True,
+    allow_methods=["*"],  # or specify ['POST', 'GET', 'OPTIONS']
+    allow_headers=["*"],
+)
+
 # Dependency for DB session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# def get_db():
+#     db = SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
 
 @app.get("/", status_code=status.HTTP_200_OK)
 def read_root():
     return {"message": "Welcome to the RADify API!"}
 
-@app.post("/signup", response_model=schemas.UserOut, status_code=status.HTTP_201_CREATED)
-def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    return signup.create_user(user, db)
+# @app.post("/signup", response_model=schemas.UserOut, status_code=status.HTTP_201_CREATED)
+# def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+#     return signup.create_user(user, db)
+
+app.include_router(signup.router)
+app.include_router(signin.router)
+app.include_router(google_oauth.router)

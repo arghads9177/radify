@@ -1,0 +1,74 @@
+<div class="auth-container">
+    <div class="auth-card">
+      <h2>{{ isSignUpMode ? 'Create Account' : 'Sign In' }}</h2>
+  
+      <form (ngSubmit)="onSubmit()" #authForm="ngForm">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" [(ngModel)]="user.email" required />
+        </div>
+
+        <div *ngIf="isSignUpMode" class="form-group">
+            <label>Name</label>
+            <input type="text" name="name" [(ngModel)]="user.name" required />
+          </div>
+  
+        <!-- Password Field -->
+        <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-wrapper">
+            <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                name="password"
+                [(ngModel)]="user.password"
+                required
+            />
+            </div>
+            
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 2px; margin-bottom: 10px;">
+            <input type="checkbox" id="showPassword" [(ngModel)]="showPassword" name="showPassword" />
+            <label for="showPassword">Show Password</label>
+          </div>
+        
+        <!-- Confirm Password Field (Shown Only During Signup) -->
+        <div class="form-group" *ngIf="isSignUpMode">
+            <label for="confirmPassword">Confirm Password</label>
+            <div class="password-wrapper">
+            <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                id="confirmPassword"
+                name="confirmPassword"
+                [(ngModel)]="user.confirmPassword"
+                required
+            />
+            </div>
+        </div>
+        <div *ngIf="isSignUpMode" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="showConfirmPassword" [(ngModel)]="showConfirmPassword" name="showConfirmPassword" />
+            <label for="showConfirmPassword">Show Confirm Password</label>
+        </div>
+  
+  
+        <button type="submit">
+          {{ isSignUpMode ? 'Sign Up' : 'Sign In' }}
+        </button>
+      </form>
+  
+      <div class="divider">OR</div>
+  
+      <button class="google-btn" (click)="signInWithGoogle()">
+        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
+        Continue with Google
+      </button>
+  
+      <p class="toggle-auth">
+        {{ isSignUpMode ? 'Already have an account?' : 'Don\'t have an account?' }}
+        <a href="#" (click)="toggleMode($event)">
+          {{ isSignUpMode ? 'Sign In' : 'Sign Up' }}
+        </a>
+      </p>
+    </div>
+  </div>
+  

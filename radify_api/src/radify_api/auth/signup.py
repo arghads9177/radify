@@ -1,7 +1,19 @@
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from src.radify_api import models, schemas
+from src.radify_api.database import SessionLocal
 from .hash import hash_password
 from fastapi import HTTPException, status
+
+router = APIRouter()
+
+# Dependency for DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 def create_user(request: schemas.UserCreate, db: Session):
     user_exists = db.query(models.User).filter(models.User.email == request.email).first()
@@ -19,3 +31,7 @@ def create_user(request: schemas.UserCreate, db: Session):
     db.commit()
     db.refresh(new_user)
     return new_user
+
+@router.post("/signup", response_model=schemas.UserOut, status_code=status.HTTP_201_CREATED)
+def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    return create_user(user, db)
