@@ -5,14 +5,17 @@ from uuid import uuid4
 from PyPDF2 import PdfReader
 import docx2txt
 
-UPLOAD_DIR = "uploaded_files"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+# UPLOAD_DIR = "uploaded_files"
+# os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
-def save_file(file: UploadFile) -> Tuple[str, str]:
+def save_upload_file(file: UploadFile, UPLOAD_DIR: str) -> Tuple[str, str]:
     """
     Saves the uploaded file and returns (filename, file_path)
     """
+
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    
     extension = file.filename.split('.')[-1]
     unique_filename = f"{uuid4()}.{extension}"
     file_path = os.path.join(UPLOAD_DIR, unique_filename)

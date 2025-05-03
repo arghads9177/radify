@@ -9,8 +9,8 @@ from datetime import datetime
 
 from src.radify_api.database import SessionLocal
 from src.radify_api import models
-from src.radify_api.agents.rad_creator import generate_rad_text
-from src.radify_api.utils.file_handler import extract_text_from_file, save_upload_file
+from .rad_creator import generate_rad_text
+from .file_handler import extract_text_from_file, save_upload_file
 
 router = APIRouter(prefix="/rad", tags=["RAD Generator"])
 
@@ -40,7 +40,7 @@ async def generate_rad(
         work_spec_ids = []
 
         for file in files:
-            file_path = save_upload_file(file, UPLOAD_DIR)
+            file_name, file_path = save_upload_file(file, UPLOAD_DIR)
             text = extract_text_from_file(file_path)
             file_texts.append(text)
 
@@ -60,6 +60,7 @@ async def generate_rad(
 
         # Generate RAD content
         rad_content = generate_rad_text(full_text)
+        print(f"Generated RAD content: {rad_content}")
 
         # Save RAD to a file
         rad_filename = f"RAD_{uuid.uuid4().hex}.txt"

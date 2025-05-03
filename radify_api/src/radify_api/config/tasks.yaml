@@ -1,15 +1,67 @@
-research_task:
+classify_project:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is 2024.
+    Analyze the provided job description {job_description} to classify the project., 
+    and accurately determine the category of the project.
+    The project must be classified as either "Web/Mobile App" or "AI/Data Science".
   expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
+    A single line in the format:
+    Project Category: Web/Mobile App
+    or
+    Project Category: AI/Data Science
 
-reporting_task:
+analyze_job:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Thoroughly analyze the job description {job_description} to extract detailed technical and functional 
+    requirements. You are an expert in IT/software project analysis. Use the project category from the 
+    previous task to tailor your breakdown. Extract all relevant information such as objectives, goals, 
+    tasks, tech stack, and timelines.
   expected_output: >
-    A fully fledge reports with the mains topics, each with a full section of information.
-    Formated as markdown with out '```'
+    A structured report including:
+    - Project Objectives
+    - Key Business Goals
+    - Functional Requirements
+    - Non-Functional Requirements
+    - Key Features or Modules
+    - Suggested Technology Stack
+    - Estimated Timeline
+    - Target User Base
+
+write_rad:
+  description: >
+    Write a professional and complete Requirement Analysis Document (RAD) based on the analyzed job and 
+    the project category. Select the appropriate RAD format according to the category:
+    Use the Web/Mobile App RAD template if it is a Web/Mobile project.
+    Use the AI/Data Science RAD template if it is an AI/Data Science project.
+  expected_output: >
+    A full RAD document following one of the two formats:
+    - Web/Mobile App RAD Template (includes sections like Project Overview, Features, Tech Stack, Screens, Timeline, Risks)
+    - AI/Data Science RAD Template (includes sections like Executive Summary, Functional & Non-Functional Requirements, 
+      Data Requirements, AI/ML Models, Evaluation Metrics)
+
+review_rad:
+  description: >
+    Review the RAD for completeness, correctness, formatting, tone, and alignment with the appropriate template.
+    Ensure every section is present and accurate. Verify if the RAD follows the correct structure based on the project category.
+  expected_output: >
+    If the project is a Web/Mobile App, the reviewed RAD should include:
+    - Title, Prepared By, Date, Version
+    - Project Overview (Name, Objective)
+    - Features (Must-have, Nice-to-have)
+    - Technology Stack
+    - Screens and Navigation Flow
+    - Project Timeline and Milestones
+    - Risks and Assumptions
+
+    If the project is an AI/Data Science project, the reviewed RAD should include:
+    - Title, Prepared By, Date, Version
+    - Project Overview and Objective
+    - Executive Summary (Scope, Deliverables, Stakeholders)
+    - Project Background and Pain Points
+    - Requirements Gathering Approach
+    - Functional and Non-Functional Requirements
+    - Data Requirements (Sources, Formats, Preprocessing)
+    - AI-Specific Details (Model Type, Architecture, Metrics)
+    - Technical Requirements (Languages, APIs, Hosting)
+    - Constraints, Assumptions, Risks & Mitigations
+    - Project Timeline
+    - Acceptance Criteria

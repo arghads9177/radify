@@ -1,0 +1,77 @@
+/* rad-generator.component.css*/
+
+.rad-generator-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.title {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin: 0.75rem 0 0.25rem;
+  font-weight: 600;
+}
+
+textarea, input[type="file"] {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:disabled {
+  background-color: #95a5a6;
+}
+
+.spinner {
+  margin-top: 1rem;
+  color: #2980b9;
+  font-weight: bold;
+}
+
+.error {
+  margin-top: 1rem;
+  color: #e74c3c;
+  font-weight: 500;
+}
+
+.rad-output {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.rad-output pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+}

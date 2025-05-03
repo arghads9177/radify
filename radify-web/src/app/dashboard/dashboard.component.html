@@ -1,3 +1,23 @@
 <p>Welcome to RADify</p>
 <button (click)="logout()">Logout</button>
+<div class="rad-generator-container">
+    <h2 class="title">RAD Generator</h2>
+    <form (submit)="onSubmit(); $event.preventDefault()">
+      <label for="jobText">Project Description</label>
+      <textarea [(ngModel)]="jobText" name="jobText" id="jobText" rows="6" placeholder="Enter job description or project context"></textarea>
+  
+      <label for="fileUpload">Upload Files (.pdf, .doc, .docx)</label>
+      <input type="file" id="fileUpload" (change)="onFileSelected($event)" multiple accept=".pdf,.doc,.docx">
+  
+      <button type="submit" [disabled]="isLoading">{{ isLoading ? 'Generating...' : 'Generate RAD' }}</button>
+    </form>
+  
+    <div *ngIf="isLoading" class="spinner">Loading...</div>
+    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  
+    <div *ngIf="radContent" class="rad-output">
+      <h3>Generated RAD</h3>
+      <pre>{{ radContent }}</pre>
+    </div>
+  </div>
 
