@@ -1,5 +1,17 @@
-<p>Welcome to RADify</p>
-<button (click)="logout()">Logout</button>
+<nav class="top-nav">
+  <div class="logo-section">
+    <img src="assets/logo.png" alt="Logo" class="logo" />
+    <span class="app-title">RADify</span>
+  </div>
+  <div class="nav-links">
+    <span class="user-info">Welcome, Argha</span>
+    <button class="logout-button" (click)=" logout()">Logout</button>
+  </div>
+</nav>
+
+
+<!-- <p>Welcome {{user.name}} to RADify</p>
+<button (click)="logout()">Logout</button> -->
 <div class="rad-generator-container">
     <h2 class="title">RAD Generator</h2>
     <form (submit)="onSubmit(); $event.preventDefault()">

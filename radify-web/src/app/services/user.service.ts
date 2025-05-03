@@ -29,6 +29,11 @@ export class UserService {
     );
   }
 
+  verifyToken(): Observable<any> {
+    const token = this.commonService.getValue('auth_token');
+    return this.http.get(`${this.baseUrl}/auth/verifyToken?token=${token}`);
+  }
+
   logout(): void {
     localStorage.removeItem('auth_token');
   }

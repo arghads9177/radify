@@ -17,7 +17,7 @@ import os
 from sqlalchemy.orm import Session
 from src.radify_api import models, schemas
 from src.radify_api.database import engine, SessionLocal
-from .auth import signup, signin, google_oauth
+from .auth import signup, signin, google_oauth, token_verification
 from .utils import rad_generator
 from dotenv import load_dotenv
 
@@ -50,3 +50,4 @@ app.include_router(signup.router)
 app.include_router(signin.router)
 app.include_router(google_oauth.router)
 app.include_router(rad_generator.router)
+app.include_router(token_verification.router)

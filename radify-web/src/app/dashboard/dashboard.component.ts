@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserService } from '../services/user.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -12,13 +12,18 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
 
   jobText: string = '';
   selectedFiles: File[] = [];
   isLoading: boolean = false;
   radContent: string = '';
-  userId: number = 1; // Replace with actual authenticated user ID if available
+  user = {
+    id: 1,
+    email: '',
+    name: '',
+    created_at: ''
+  } // Replace with actual authenticated user ID if available
   errorMessage: string = '';
 
   constructor(
@@ -26,6 +31,14 @@ export class DashboardComponent {
     private router: Router,
     private radService: RadGenerationService
   ) {}
+
+  ngOnInit(): void {
+    this.userService.verifyToken().subscribe({
+      next: (res) => {
+        this.user = {...res}
+      }
+    })
+  }
 
   logout(): void {
     this.userService.logout();
@@ -44,7 +57,7 @@ export class DashboardComponent {
 
     const formData = new FormData();
     formData.append('job_text', this.jobText);
-    formData.append('user_id', this.userId.toString());
+    formData.append('user_id', this.user.id.toString());
 
     this.selectedFiles.forEach(file => {
       formData.append('files', file);
