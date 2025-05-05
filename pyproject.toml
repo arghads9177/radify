@@ -1,0 +1,23 @@
+[project]
+name = "radify"
+version = "0.1.0"
+description = "radify using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "crewai[tools]>=0.118.0,<1.0.0"
+]
+
+[project.scripts]
+radify = "radify.main:run"
+run_crew = "radify.main:run"
+train = "radify.main:train"
+replay = "radify.main:replay"
+test = "radify.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"
