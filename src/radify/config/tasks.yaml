@@ -1,20 +1,13 @@
-classify_project:
-  description: >
-    Analyze the provided job description {job_description} to classify the project., 
-    and accurately determine the category of the project.
-    The project must be classified as either "Web/Mobile App" or "AI/Data Science".
-  expected_output: >
-    A single line in the format:
-    Project Category: Web/Mobile App
-    or
-    Project Category: AI/Data Science
 
 analyze_job:
   description: >
     Thoroughly analyze the job description {job_description} to extract detailed technical and functional 
-    requirements. You are an expert in IT/software project analysis. Use the project category from the 
-    previous task to tailor your breakdown. Extract all relevant information such as objectives, goals, 
-    tasks, tech stack, and timelines.
+    requirements. You are an expert in IT/software and AI/data science project analysis. First find the 
+    software(web and/or mobile andor desktop) features and AI/data science features from the given job descripton 
+    to tailor your breakdown. Extract all relevant information such as objectives, goals, tasks, tech stack/technical skills, and timelines, 
+    Compliance & Security, integration with external system/API.
+    If AI components are present in the requirement analyze the type of usecase(Machine Learning/Deep Learning or Generitive AI 
+    or Computer Vision or Agentic AI).
   expected_output: >
     A structured report including:
     - Project Objectives
@@ -23,45 +16,70 @@ analyze_job:
     - Non-Functional Requirements
     - Key Features or Modules
     - Suggested Technology Stack
+    - Constraints, Assumptions, Risks & Mitigations
+    - Technology Stack and Technical Skill Requirements (Languages, frameworks, models, APIs, Hosting) if mentioned.
     - Estimated Timeline
     - Target User Base
+    - AI use case(if AI component is present)
+    - Compliance & Security
+    - Integrations
 
 write_rad:
   description: >
-    Write a professional and complete Requirement Analysis Document (RAD) based on the analyzed job and 
-    the project category. Select the appropriate RAD format according to the category:
-    Use the Web/Mobile App RAD template if it is a Web/Mobile project.
-    Use the AI/Data Science RAD template if it is an AI/Data Science project.
+    Write a professional and complete Requirement Analysis Document (RAD) based on the analyzed job. 
+    Select the appropriate markdown format including different titles, subtitles, bullet points, numbered list for RAD.
+    
   expected_output: >
-    A full RAD document following one of the two formats:
-    - Web/Mobile App RAD Template (includes sections like Project Overview, Features, Tech Stack, Screens, Timeline, Risks)
-    - AI/Data Science RAD Template (includes sections like Executive Summary, Functional & Non-Functional Requirements, 
+    A full RAD document should maintain the following template:
+    - Title, Prepared By, Date, Version
+    - Project Overview (Name, Objective)
+    - For Web/Mobile/Desktop App(if present) includes sections like Features, Screens.
+    - AI/Data Science part(if present) includes sections like Executive Summary, Functional & Non-Functional Requirements, 
       Data Requirements, AI/ML Models, Evaluation Metrics)
+    - Technology Stack for Web/Mobile and API development. If not mentioned Use the following:
+      - Web App Development: Angular(latest)
+      - Backend Development: Node.js/Express.js for REST API.
+      - Database: MongoDB
+      - Mobile Development: Flutter
+    -  Technical Requirements (Languages, APIs, Hosting) for AI/Data Science development. If not mentioned Use the following:
+      - Language: Python
+      - For Machine Learning Models: Scikit-learn and xgboost etc.
+      - For Deep Learning: Tensorflow/Keras
+      - Generative AI: LangChain (If it is a generative AI usecase)
+      - Agentic AI: Crew AI, LangGraph, Agno (If it is a agentic AI usecase)
+    
+    Keep the following points in mind while writing the RAD:
+    - If analyzed job contains details of Technology stack or technical skill requirements maintain the same tech stack 
+      or technical skills only. Otherwise you analyze the what teck stack or technical skills required to solve this job 
+      and mention those only.
 
 review_rad:
   description: >
     Review the RAD for completeness, correctness, formatting, tone, and alignment with the appropriate template.
-    Ensure every section is present and accurate. Verify if the RAD follows the correct structure based on the project category.
+    Ensure every section is present and accurate. Verify if the RAD follows the correct structure based on the components 
+    (Web and/or mobile and AI).
   expected_output: >
-    If the project is a Web/Mobile App, the reviewed RAD should include:
-    - Title, Prepared By, Date, Version
+    The reviewed RAD should include:
+    - Title, Prepared By, Date(Current date), Version(1.0.0)
     - Project Overview (Name, Objective)
-    - Features (Must-have, Nice-to-have)
-    - Technology Stack
-    - Screens and Navigation Flow
-    - Project Timeline and Milestones
-    - Risks and Assumptions
-
-    If the project is an AI/Data Science project, the reviewed RAD should include:
-    - Title, Prepared By, Date, Version
-    - Project Overview and Objective
-    - Executive Summary (Scope, Deliverables, Stakeholders)
-    - Project Background and Pain Points
-    - Requirements Gathering Approach
-    - Functional and Non-Functional Requirements
-    - Data Requirements (Sources, Formats, Preprocessing)
-    - AI-Specific Details (Model Type, Architecture, Metrics)
-    - Technical Requirements (Languages, APIs, Hosting)
+    - Project Background and Pain Points (if AI/Data science components present)
+    - Executive Summary (Scope, Deliverables, Stakeholders) (if AI/Data science components present)
+    - Features (Must-have, Nice-to-have) (if IT/software components present)
+    - Functional and Non-Functional Requirements if (if AI/Data science components present)
+    - Data Requirements (Sources, Formats, Preprocessing) (if AI/Data science components present)
+    - Requirements Gathering Approach (if AI/Data science components present)
+    - AI-Specific Details (Model Type, Architecture, Metrics) (if AI/Data science components present)
+    - Technology Stack if IT/software components present.
+    - Screens and Navigation Flow if IT/software components present.
+    - Acceptance Criteria (if AI/Data science components present)
     - Constraints, Assumptions, Risks & Mitigations
-    - Project Timeline
-    - Acceptance Criteria
+    - Compliance & Security
+    - Integrations
+    - Project Timeline and Milestones
+
+    Also maintain the following points:
+    - It must maintain the same order that mentioned above.
+    - It  must maintain the same titles for each point as mentioned above.
+    - Add Constraints, Assumptions, Risks & Mitigations only if reqire for the jobe or mention in the analyzed job.
+    - Add Compliance & Security only if reqire for the jobe or mention in the analyzed job.
+    - Add Integrations only if reqire for the jobe or mention in the analyzed job.

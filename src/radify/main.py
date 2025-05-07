@@ -4,7 +4,13 @@ import warnings
 
 from datetime import datetime
 
+import crewai.agent
+
 from crew import Radify
+
+import crewai
+print(dir(crewai))
+
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -56,7 +62,8 @@ def run():
     }
     
     try:
-        Radify().crew().kickoff(inputs=inputs)
+        response = Radify().crew().kickoff(inputs=inputs)
+        print(response)
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 

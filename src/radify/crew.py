@@ -1,4 +1,6 @@
 from crewai import Agent, Crew, Process, Task
+from crewai import LLM
+# from langchain_groq import ChatGroq
 from crewai.project import CrewBase, agent, crew, task
 # from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
@@ -8,6 +10,17 @@ from dotenv import load_dotenv
 # https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
 
 load_dotenv()
+
+
+llm = LLM(
+    model= "groq/llama3-70b-8192",
+    temperature= 0.2
+)
+
+# llm = ChatGroq(
+#     model= "llama3-70b-8192",
+#     temperature=0.2
+# )
 
 @CrewBase
 class Radify():
@@ -24,43 +37,51 @@ class Radify():
     
     # If you would like to add tools to your agents, you can learn more about it here:
     # https://docs.crewai.com/concepts/agents#agent-tools
-    @agent
-    def project_classifier(self) -> Agent:
-        return Agent(
-            config=self.agents_config['project_classifier'], # type: ignore[index]
-            verbose=True
-        )
+    # @agent
+    # def project_classifier(self) -> Agent:
+    #     agent=  Agent(
+    #         config=self.agents_config['project_classifier'], # type: ignore[index]
+    #         verbose=True
+    #     )
+    #     agent.llm = llm
+    #     return agent
 
     @agent
     def job_analyzer(self) -> Agent:
-        return Agent(
+        agent=  Agent(
             config=self.agents_config['job_analyzer'], # type: ignore[index]
             verbose=True
         )
+        agent.llm = llm
+        return agent
     
     @agent
     def rad_writer(self) -> Agent:
-        return Agent(
+        agent= Agent(
             config = self.agents_config['rad_writer'],
             verbose=True
         )
+        agent.llm = llm
+        return agent
     
     @agent
     def quality_reviewer(self) -> Agent:
-        return Agent(
+        agent= Agent(
             config = self.agents_config['quality_reviewer'],
             verbose=True
         )
+        agent.llm = llm
+        return agent
 
     # To learn more about structured task outputs,
     # task dependencies, and task callbacks, check out the documentation:
     # https://docs.crewai.com/concepts/tasks#overview-of-a-task
-    @task
-    def classify_project(self) -> Task:
-        return Task(
-            config=self.tasks_config['classify_project'], # type: ignore[index]
-            agent = self.project_classifier()
-        )
+    # @task
+    # def classify_project(self) -> Task:
+    #     return Task(
+    #         config=self.tasks_config['classify_project'], # type: ignore[index]
+    #         agent = self.project_classifier()
+    #     )
     
     @task
     def analyze_job(self) -> task:
