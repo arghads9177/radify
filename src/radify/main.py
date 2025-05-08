@@ -1,23 +1,17 @@
 #!/usr/bin/env python
 import sys
 import warnings
+import gradio as gr
+import time
+from PyPDF2 import PdfReader
+import docx2txt
+# import crewai.agent
 
-from datetime import datetime
-
-import crewai.agent
-
-from crew import Radify
-
-import crewai
-print(dir(crewai))
+# from crew import Radify
+from create_rad import generate
 
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
-
-# This main file is intended to be a way for you to run your
-# crew locally, so refrain from adding unnecessary logic into this file.
-# Replace with inputs you want to test with, it will automatically
-# interpolate any tasks and agents information
 
 job_desc = """
 We’re building an AI-powered healthcare chatbot to assist patients with symptom assessment, medical FAQs, and appointment scheduling. The chatbot must integrate with EHR systems, comply with HIPAA/GDPR, and leverage OpenAI models fine-tuned for medical contexts.
@@ -52,59 +46,79 @@ Optimize response accuracy and latency using real user feedback.
   - Vector DB integration for context retention
 ✔ Timeline and total Budget
 """
+# rad_doc = generate(job_desc=job_desc)
+# print(rad_doc)
 
-def run():
-    """
-    Run the crew.
-    """
-    inputs = {
-        "job_description": job_desc
-    }
-    
-    try:
-        response = Radify().crew().kickoff(inputs=inputs)
-        print(response)
-    except Exception as e:
-        raise Exception(f"An error occurred while running the crew: {e}")
+# Gradio UI Development
+def extract_text_from_file(file):
+    if file is None:
+        return ""
+    file_path = file.name
+    if file_path.endswith(".pdf"):
+        # doc = fitz.open(file_path)
+        # text = "\n".join([page.get_text() for page in doc])
+        # doc.close()
+        reader = PdfReader(file_path)
+        for page in reader.pages:
+            text += page.extract_text() or ""
+    elif file_path.endswith(".docx"):
+        text = docx2txt.process(file_path)
+    else:
+        text = ""
+    return text.strip()
 
+def preprocess_input(text_input, file_input):
+    if not text_input and not file_input:
+        return gr.update(visible=False), gr.update(value="⚠️ Please enter job requirement text or upload a file.", visible=True), gr.update(visible=False), ""
 
-def train():
-    """
-    Train the crew for a given number of iterations.
-    """
-    inputs = {
-        "topic": "AI LLMs",
-        'current_year': str(datetime.now().year)
-    }
-    try:
-        Radify().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
+    final_text = text_input.strip()
+    if not final_text and file_input:
+        final_text = extract_text_from_file(file_input)
 
-    except Exception as e:
-        raise Exception(f"An error occurred while training the crew: {e}")
+    if not final_text:
+        return gr.update(visible=False), gr.update(value="⚠️ The uploaded file appears empty or unsupported.", visible=True), gr.update(visible=False), ""
 
-def replay():
-    """
-    Replay the crew execution from a specific task.
-    """
-    try:
-        Radify().crew().replay(task_id=sys.argv[1])
+    return gr.update(visible=True), gr.update(visible=False), gr.update(visible=False), final_text
 
-    except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
+def generate_rad(job_desc):
+    rad_result = generate(job_desc)
+    return gr.update(visible=False), gr.update(visible=True, value=rad_result)
 
-def test():
-    """
-    Test the crew execution and returns the results.
-    """
-    inputs = {
-        "topic": "AI LLMs",
-        "current_year": str(datetime.now().year)
-    }
-    
-    try:
-        Radify().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
+with gr.Blocks(title="RADify") as demo:
+    gr.Markdown("## 📄 RADify\n**AI agent to generate a professional Requirement Analysis Document (RAD)**")
 
-    except Exception as e:
-        raise Exception(f"An error occurred while testing the crew: {e}")
+    with gr.Row():
+        text_input = gr.Textbox(label="📝 Enter Job Requirement", lines=8, placeholder="Paste job requirement here...")
+        file_input = gr.File(label="📁 Upload Job Requirement File (PDF/DOCX)", file_types=[".pdf", ".docx"])
 
-run()
+    job_text_state = gr.State()
+
+    submit_btn = gr.Button("🚀 Generate RAD", variant="primary")
+    # clear_btn = gr.ClearButton("Reset")
+
+    spinner = gr.HTML("""
+        <div id="loader" style="display: flex; justify-content: center; margin: 20px;">
+            <div style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
+        </div>
+        <style>
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    """, visible=False)
+
+    error_md = gr.Markdown("", visible=False)
+    output_md = gr.Markdown("", visible=False)
+
+    # Step 1: Preprocess and show spinner
+    submit_btn.click(preprocess_input,
+                     inputs=[text_input, file_input],
+                     outputs=[spinner, error_md, output_md, job_text_state])
+
+    # Step 2: Trigger actual RAD generation
+    submit_btn.click(generate_rad,
+                     inputs=[job_text_state],
+                     outputs=[spinner, output_md])
+
+demo.launch(share=True)
