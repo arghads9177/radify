@@ -50,51 +50,85 @@ Optimize response accuracy and latency using real user feedback.
 # print(rad_doc)
 
 # Gradio UI Development
-def extract_text_from_file(file):
-    if file is None:
+def extract_text_from_files(files):
+    if not files:
         return ""
-    file_path = file.name
-    if file_path.endswith(".pdf"):
-        # doc = fitz.open(file_path)
-        # text = "\n".join([page.get_text() for page in doc])
-        # doc.close()
-        reader = PdfReader(file_path)
-        for page in reader.pages:
-            text += page.extract_text() or ""
-    elif file_path.endswith(".docx"):
-        text = docx2txt.process(file_path)
-    else:
-        text = ""
-    return text.strip()
 
-def preprocess_input(text_input, file_input):
+    all_text = ""
+
+    for file in files:
+        file_path = file.name
+        if file_path.endswith(".pdf"):
+            reader = PdfReader(file_path)
+            for page in reader.pages:
+                all_text += page.extract_text() or ""
+        elif file_path.endswith(".docx"):
+            all_text += docx2txt.process(file_path)
+    
+    return all_text.strip()
+
+def validate_and_store(text_input, file_input):
     if not text_input and not file_input:
-        return gr.update(visible=False), gr.update(value="⚠️ Please enter job requirement text or upload a file.", visible=True), gr.update(visible=False), ""
+        raise gr.Error("⚠️ Please enter job requirement text or upload a file.")
 
     final_text = text_input.strip()
     if not final_text and file_input:
-        final_text = extract_text_from_file(file_input)
+        final_text = extract_text_from_files(file_input)
 
     if not final_text:
-        return gr.update(visible=False), gr.update(value="⚠️ The uploaded file appears empty or unsupported.", visible=True), gr.update(visible=False), ""
+        raise gr.Error("⚠️ The uploaded file appears empty or unsupported.")
 
-    return gr.update(visible=True), gr.update(visible=False), gr.update(visible=False), final_text
+    return (
+        final_text, 
+        gr.update(visible=True),                 # spinner
+        gr.update(visible=False),                # output_md
+        gr.update(interactive=False),            # submit_btn (disable)
+        gr.update(interactive=False)             # clear_btn (disable)
+    )
 
 def generate_rad(job_desc):
-    rad_result = generate(job_desc)
-    return gr.update(visible=False), gr.update(visible=True, value=rad_result)
+    if not job_desc.strip():
+        # No action if input is empty (after clear)
+        return (
+            gr.update(visible=False),     # output_md
+            gr.update(visible=False),     # spinner
+            gr.update(interactive=True),  # submit_btn
+            gr.update(interactive=True)   # clear_btn
+        )
+
+    try:
+        result = generate(job_desc)
+        return (
+            gr.update(value=result, visible=True),  # output_md
+            gr.update(visible=False),               # spinner
+            gr.update(interactive=True),            # submit_btn
+            gr.update(interactive=True)             # clear_btn
+        )
+    except Exception as e:
+        error_msg = f"❌ RAD generation failed: {e}"
+        return (
+            gr.update(value=error_msg, visible=True),  # show in output_md as error text
+            gr.update(visible=False),
+            gr.update(interactive=True),
+            gr.update(interactive=True)
+        )
+    
+
+def clear_form():
+    return "", None, "", gr.update(visible=False), gr.update(value="", visible=False), gr.update(value="", visible=False)
 
 with gr.Blocks(title="RADify") as demo:
     gr.Markdown("## 📄 RADify\n**AI agent to generate a professional Requirement Analysis Document (RAD)**")
 
     with gr.Row():
         text_input = gr.Textbox(label="📝 Enter Job Requirement", lines=8, placeholder="Paste job requirement here...")
-        file_input = gr.File(label="📁 Upload Job Requirement File (PDF/DOCX)", file_types=[".pdf", ".docx"])
+        file_input = gr.File(label="📁 Upload Job Requirement Files (PDF/DOCX)", file_types=[".pdf", ".docx"], file_count="multiple")
+
+    with gr.Row():
+        submit_btn = gr.Button("🚀 Generate RAD", variant="primary")
+        clear_btn = gr.Button("🧹 Clear")
 
     job_text_state = gr.State()
-
-    submit_btn = gr.Button("🚀 Generate RAD", variant="primary")
-    # clear_btn = gr.ClearButton("Reset")
 
     spinner = gr.HTML("""
         <div id="loader" style="display: flex; justify-content: center; margin: 20px;">
@@ -108,17 +142,29 @@ with gr.Blocks(title="RADify") as demo:
         </style>
     """, visible=False)
 
-    error_md = gr.Markdown("", visible=False)
     output_md = gr.Markdown("", visible=False)
 
-    # Step 1: Preprocess and show spinner
-    submit_btn.click(preprocess_input,
-                     inputs=[text_input, file_input],
-                     outputs=[spinner, error_md, output_md, job_text_state])
+    # Step 1: Validate input and set state
+    submit_btn.click(
+        fn=validate_and_store,
+        inputs=[text_input, file_input],
+        outputs=[job_text_state, spinner, output_md, submit_btn, clear_btn]
+    )
 
-    # Step 2: Trigger actual RAD generation
-    submit_btn.click(generate_rad,
-                     inputs=[job_text_state],
-                     outputs=[spinner, output_md])
+    # Step 2: Trigger generate only if state is set
+    job_text_state.change(
+        fn=generate_rad,
+        inputs=[job_text_state],
+        outputs=[output_md, spinner, submit_btn, clear_btn]
+    )
 
-demo.launch(share=True)
+    # Clear button
+    clear_btn.click(
+        fn=clear_form,
+        inputs=[],
+        outputs=[text_input, file_input, job_text_state, spinner, output_md]
+    )
+
+demo.launch()
+
+# demo.launch(share=True)
