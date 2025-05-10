@@ -101,7 +101,7 @@ class Radify():
     def review_rad(self) -> Task:
         return Task(
             config=self.tasks_config['review_rad'], # type: ignore[index]
-            output_file='rad.md',
+            # output_file='rad.md',
             agent= self.quality_reviewer()
         )
 
