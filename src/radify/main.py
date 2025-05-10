@@ -8,6 +8,8 @@ import docx2txt
 # import crewai.agent
 
 # from crew import Radify
+import sys
+sys.path.append("src/radify")
 from create_rad import generate
 
 
@@ -164,7 +166,8 @@ with gr.Blocks(title="RADify") as demo:
         inputs=[],
         outputs=[text_input, file_input, job_text_state, spinner, output_md]
     )
-
-demo.launch()
+# Used by app.py
+__all__ = ["demo"]
+# demo.launch()
 
 # demo.launch(share=True)
